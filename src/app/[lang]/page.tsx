@@ -7,7 +7,7 @@ import { ServiceDemo } from "@/components/demos/ServiceDemo";
 import { ContributionGraph } from "@/components/github/ContributionGraph";
 import { CopyButton, LocalTime, Reveal, ScrollMeter, Tilt } from "@/components/interactive";
 import { Loader } from "@/components/Loader";
-import { Cursor, Scramble } from "@/components/motion";
+import { Scramble } from "@/components/motion";
 import { Chars, Headline, Words, wordCount } from "@/components/text";
 import { LangSwitch, ThemeToggle } from "@/components/theme";
 import { getContributions } from "@/lib/github";
@@ -36,7 +36,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   return (
     <>
       <Loader lang={lang} />
-      <Cursor dragLabel={t.cursor.drag} />
       <a className="skip" href="#services">
         {t.nav.skip}
       </a>
@@ -118,7 +117,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                     <ul className="service__points">
                       {copy.points.map((p, k) => (
                         <li key={p} style={i(k)}>
-                          {p}
+                          <span>
+                            <Words text={p} start={8 + k * 6} />
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -216,7 +217,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
 
           <ul className="contact__list">
             <Reveal as="li" className="contact__row">
-              <span className="label">{t.contact.email}</span>
+              <span className="label">
+                <Scramble text={t.contact.email} />
+              </span>
               <a className="contact__value roll" data-text={site.email} href={`mailto:${site.email}`}>
                 <span>{site.email}</span>
               </a>
@@ -225,21 +228,29 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               </CopyButton>
             </Reveal>
             <Reveal as="li" className="contact__row" delay={90}>
-              <span className="label">{t.contact.phone}</span>
+              <span className="label">
+                <Scramble text={t.contact.phone} />
+              </span>
               <a className="contact__value roll" data-text={site.phone} href={site.phoneHref}>
                 <span>{site.phone}</span>
               </a>
-              <span className="contact__action contact__action--hint label">{t.contact.call}</span>
+              <span className="contact__action contact__action--hint label">
+                <Scramble text={t.contact.call} />
+              </span>
             </Reveal>
             <Reveal as="li" className="contact__row" delay={180}>
-              <span className="label">{t.contact.instagram}</span>
+              <span className="label">
+                <Scramble text={t.contact.instagram} />
+              </span>
               <a className="contact__value roll" data-text={`@${site.instagram}`} href={site.instagramHref} target="_blank" rel="noreferrer">
                 <span>@{site.instagram}</span>
               </a>
               <span className="contact__action contact__action--hint label">↗</span>
             </Reveal>
             <Reveal as="li" className="contact__row" delay={270}>
-              <span className="label">{t.contact.github}</span>
+              <span className="label">
+                <Scramble text={t.contact.github} />
+              </span>
               <a className="contact__value roll" data-text={`@${site.github}`} href={site.githubHref} target="_blank" rel="noreferrer">
                 <span>@{site.github}</span>
               </a>
@@ -250,14 +261,11 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       </main>
 
       <footer className="footer">
-        <Reveal className="footer__giant">
-          <Chars text={t.name.first} />
-        </Reveal>
         <CloudBand className="footer__clouds" bank="bottom" cover={0.62} size={13} />
         <div className="footer__row label">
-          <span>© 2026 {t.name.full}</span>
-          <span>{t.footer.built}</span>
-          <span>{t.location}</span>
+          <Scramble text={`© 2026 ${t.name.full}`} />
+          <Scramble text={t.footer.built} />
+          <Scramble text={t.location} />
         </div>
       </footer>
 

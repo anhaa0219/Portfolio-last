@@ -26,7 +26,6 @@ const en = {
   location: "Ulaanbaatar, Mongolia",
   nav: { services: "Services", about: "About", github: "GitHub", contact: "Contact", skip: "Skip to content", top: "back to top", clock: "UB" },
   toggles: { lang: "MN", langLabel: "Монгол хэл рүү шилжих", themeLabel: "Switch between day and night mode" },
-  cursor: { drag: "Drag" },
   loader: { tagline: "Full-stack · AI automation", drawing: "Drawing the portfolio", loading: (n: number) => `Loading, ${n} percent` },
   hero: {
     aria: "Introduction",
@@ -84,8 +83,6 @@ const en = {
     on: (date: string) => `on ${date}`,
     tip: (n: number, date: string) => `${n === 0 ? "No" : n} contribution${n === 1 ? "" : "s"} on ${date}`,
     summary: (n: number) => `${n} contributions in the last year`,
-    peak: "Busiest day",
-    monthly: "Month by month",
     weekdays: ["Mon", "Wed", "Fri"],
     months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     less: "Less",
@@ -192,7 +189,6 @@ const mn: Dict = {
   location: "Улаанбаатар, Монгол",
   nav: { services: "Үйлчилгээ", about: "Тухай", github: "GitHub", contact: "Холбогдох", skip: "Үндсэн хэсэг рүү очих", top: "эхэнд нь буцах", clock: "УБ" },
   toggles: { lang: "EN", langLabel: "Switch to English", themeLabel: "Өдөр, шөнийн горим" },
-  cursor: { drag: "Чир" },
   loader: { tagline: "Full-stack · AI автоматжуулалт", drawing: "Ачаалж байна", loading: (n: number) => `Ачаалж байна, ${n}%` },
   hero: {
     aria: "Танилцуулга",
@@ -250,8 +246,6 @@ const mn: Dict = {
     on: (date: string) => date,
     tip: (n: number, date: string) => (n === 0 ? `${date}: идэвхгүй` : `${date}: ${n} contribution`),
     summary: (n: number) => `Сүүлийн нэг жилд ${n} contribution`,
-    peak: "Хамгийн идэвхтэй",
-    monthly: "Сар бүрээр",
     weekdays: ["Да", "Лх", "Ба"],
     months: ["1-р", "2-р", "3-р", "4-р", "5-р", "6-р", "7-р", "8-р", "9-р", "10-р", "11-р", "12-р"],
     less: "Бага",

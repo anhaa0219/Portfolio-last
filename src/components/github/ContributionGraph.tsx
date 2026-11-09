@@ -3,12 +3,11 @@
 import { useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import type { Contributions, Day } from "@/lib/github";
 import { getDict, type Lang } from "@/lib/i18n";
-import { CountUp, useInView } from "../motion";
+import { CountUp, Scramble, useInView } from "../motion";
 
-// The last year on GitHub, told as it scrolls in: the figures count up, the
-// calendar inks in as a diagonal wave from the oldest week to today, a light
-// sweeps across it, the busiest day pulses with its tag, and the months rise
-// as bars one after another.
+// The last year on GitHub, told as it scrolls in: the labels decode, the
+// figures count up, the calendar inks in as a diagonal wave from the oldest
+// week to today, and a light sweeps across it.
 
 const EN_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -27,7 +26,6 @@ export function ContributionGraph({ data, profile, lang }: { data: Contributions
   const t = getDict(lang).github;
   const [tip, setTip] = useState<Tip>(null);
   const [calRef, calIn] = useInView<HTMLDivElement>();
-  const [barRef, barIn] = useInView<HTMLDivElement>();
 
   // A month label sits over the first column that starts in that month
   const monthLabels = (() => {
@@ -54,8 +52,6 @@ export function ContributionGraph({ data, profile, lang }: { data: Contributions
     if (day) setTip({ day, x: c.left - box.left + c.width / 2, y: c.top - box.top });
   };
 
-  const peak = data.best;
-  const maxMonth = Math.max(1, ...data.months.map((m) => m.count));
   const stats = [
     { k: t.total, n: data.total, unit: "" },
     { k: t.longest, n: data.longestStreak, unit: t.days(data.longestStreak) },
@@ -68,7 +64,9 @@ export function ContributionGraph({ data, profile, lang }: { data: Contributions
       <dl className="gh-stats">
         {stats.map((s, i) => (
           <div key={s.k} className="gh-stat" style={v({ "--i": i })}>
-            <dt className="label">{s.k}</dt>
+            <dt className="label">
+              <Scramble text={s.k} />
+            </dt>
             <dd className="gh-stat__v">
               <CountUp value={s.n} duration={1400 + i * 200} />
               {s.unit && <span className="gh-stat__unit"> {s.unit}</span>}
@@ -79,7 +77,9 @@ export function ContributionGraph({ data, profile, lang }: { data: Contributions
 
       <div className="gh-card" ref={calRef} data-in={calIn || undefined}>
         <div className="gh-bar">
-          <span className="label">{t.summary(data.total)}</span>
+          <span className="label">
+            <Scramble text={t.summary(data.total)} />
+          </span>
           <span className="gh-legend" aria-hidden>
             {t.less}
             {[0, 1, 2, 3, 4].map((l) => (
@@ -113,27 +113,11 @@ export function ContributionGraph({ data, profile, lang }: { data: Contributions
                         className="gh-cell"
                         data-date={day.date}
                         data-level={day.level}
-                        data-peak={peak?.date === day.date || undefined}
                         style={v({ gridColumn: w + 1, gridRow: d + 1, "--d": w + d * 2 })}
                       />
                     ) : null,
                   ),
                 )}
-                {peak &&
-                  (() => {
-                    const w = data.weeks.findIndex((wk) => wk.some((d) => d?.date === peak.date));
-                    const d = data.weeks[w]?.findIndex((x) => x?.date === peak.date) ?? 0;
-                    // The tag hangs above the day; near the right edge it opens leftward
-                    const flip = w > data.weeks.length - 10;
-                    return (
-                      <span className="gh-peak" data-flip={flip || undefined} style={{ gridColumn: w + 1, gridRow: d + 1 }} aria-hidden>
-                        <span className="gh-peak__tag">
-                          {t.peak} · {peak.count}
-                          <small>{dateText(peak.date, lang, false)}</small>
-                        </span>
-                      </span>
-                    );
-                  })()}
                 <span className="gh-sweep" aria-hidden />
               </div>
             </div>
@@ -145,30 +129,11 @@ export function ContributionGraph({ data, profile, lang }: { data: Contributions
             </div>
           )}
         </div>
-      </div>
 
-      <div className="gh-card gh-monthly" ref={barRef} data-in={barIn || undefined}>
-        <div className="gh-bar">
-          <span className="label">{t.monthly}</span>
+        <div className="gh-bar gh-bar--foot">
           <a className="link gh-profile" href={`https://github.com/${profile}`} target="_blank" rel="noreferrer">
             github.com/{profile} ↗
           </a>
-        </div>
-        <div className="gh-bars">
-          {data.months.map((m, i) => (
-            <div
-              key={`${m.year}-${m.month}`}
-              className="gh-bar-col"
-              data-top={m.count === maxMonth || undefined}
-              style={v({ "--h": (m.count / maxMonth).toFixed(3), "--i": i })}
-            >
-              <span className="gh-bar-col__stack">
-                <span className="gh-bar-col__n">{m.count}</span>
-                <span className="gh-bar-col__bar" />
-              </span>
-              <span className="gh-bar-col__m">{t.months[m.month]}</span>
-            </div>
-          ))}
         </div>
       </div>
     </div>

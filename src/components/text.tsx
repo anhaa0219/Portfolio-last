@@ -1,14 +1,29 @@
 import type { CSSProperties } from "react";
 
 // Text that moves in. These render on the server: each word (or letter) is
-// a masked span carrying its index, and CSS plays the entrance once the
-// nearest `.reveal` ancestor is marked shown. The words themselves stay in
-// the HTML, so search engines, screen readers and no-JS visitors get plain
-// text.
+// a span carrying its index and, for words, a scatter: where it flies in
+// from. CSS plays the entrance once the nearest `.reveal` ancestor is marked
+// shown. The words themselves stay in the HTML, so search engines, screen
+// readers and no-JS visitors get plain text.
 
 const idx = (i: number) => ({ "--i": i }) as CSSProperties;
 
-/** Words that rise out of a mask one after another. `start` continues a count across pieces. */
+/** A fixed pseudo-random number in -1..1 for a word, the same on every render. */
+function scatter(i: number, salt: number) {
+  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return (x - Math.floor(x)) * 2 - 1;
+}
+
+/** Where a word flies in from: off to a side, below or above, turned. */
+const flight = (i: number) =>
+  ({
+    "--i": i,
+    "--fx": `${Math.round(scatter(i, 1) * 180)}px`,
+    "--fy": `${Math.round(70 + scatter(i, 2) * 130)}px`,
+    "--fr": `${Math.round(scatter(i, 3) * 45)}deg`,
+  }) as CSSProperties;
+
+/** Words that fly in from scattered places and settle into the line. `start` continues a count across pieces. */
 export function Words({ text, start = 0 }: { text: string; start?: number }) {
   let n = start;
   return (
@@ -17,7 +32,7 @@ export function Words({ text, start = 0 }: { text: string; start?: number }) {
         /^\s+$/.test(part) || part === "" ? (
           part
         ) : (
-          <span key={i} className="w" style={idx(n++)}>
+          <span key={i} className="w" style={flight(n++)}>
             <span className="w__in">{part}</span>
           </span>
         ),
@@ -28,7 +43,7 @@ export function Words({ text, start = 0 }: { text: string; start?: number }) {
 
 export const wordCount = (text: string) => text.split(/\s+/).filter(Boolean).length;
 
-/** A heading with one italic phrase, all of it rising word by word. */
+/** A heading with one italic phrase, every word flying in. */
 export function Headline({ parts }: { parts: readonly [string, string, string] }) {
   const a = wordCount(parts[0]);
   const b = wordCount(parts[1]);

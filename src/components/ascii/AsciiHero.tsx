@@ -69,6 +69,32 @@ export function AsciiHero({ children, className, labels }: { children?: ReactNod
     let solid: string[] = [];
     let soft: string[] = [];
 
+    // The copy and the object are laid out as one group, centered on the
+    // screen: the copy steps in from the edge by half the space left over,
+    // and the object sits a short gap after the copy's widest line
+    const GAP = 56;
+    const sizeFor = (visW: number, visH: number, wide: boolean) =>
+      wide ? Math.min(1.05, visH / 6.4) : Math.min(visW / 5.8, visH / 10.5);
+    const copy = { right: 0, mid: 0 };
+    const layoutCopy = (width: number, visW: number, visH: number) => {
+      const el = section.querySelector<HTMLElement>(".hero__copy");
+      if (!el) return;
+      const widest = Math.max(
+        0,
+        ...Array.from(el.querySelectorAll<HTMLElement>(".hero__line, .hero__lede")).map((n) => n.offsetWidth),
+      );
+      if (width >= 760) {
+        const radius = 1.6 * sizeFor(visW, visH, true) * (width / visW);
+        const gutter = parseFloat(getComputedStyle(section).paddingLeft) || 0;
+        const shift = Math.max(0, (width - (widest + GAP + radius * 2)) / 2 - gutter);
+        el.style.marginLeft = `${Math.round(shift)}px`;
+      } else {
+        el.style.marginLeft = "";
+      }
+      copy.right = el.offsetLeft + widest;
+      copy.mid = el.offsetTop + el.offsetHeight / 2;
+    };
+
     const resize = () => {
       const narrow = section.clientWidth < 760;
       grid = fitGrid(canvas, narrow ? 10 : 12);
@@ -87,6 +113,8 @@ export function AsciiHero({ children, className, labels }: { children?: ReactNod
       }
       camera.aspect = (grid.cols * grid.cw) / (grid.rows * grid.ch);
       camera.updateProjectionMatrix();
+      const visH = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+      layoutCopy(grid.width, visH * camera.aspect, visH);
       draw(performance.now());
     };
 
@@ -150,8 +178,20 @@ export function AsciiHero({ children, className, labels }: { children?: ReactNod
       const visH = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
       const visW = visH * camera.aspect;
       const wide = grid.width >= 760;
-      const baseScale = wide ? Math.min(1.05, visH / 6.4) : Math.min(visW / 5.8, visH / 10.5);
-      group.position.set(wide ? visW * 0.22 : 0, (wide ? 0.05 : visH * 0.24) + scroll * visH * 0.45, 0);
+      const baseScale = sizeFor(visW, visH, wide);
+      // Wide: the object's left edge sits a short gap after the copy's right
+      // edge, level with the copy's middle, never past the screen's edge
+      let x = 0;
+      let y = visH * 0.24;
+      if (wide) {
+        const unit = grid.width / visW; // px per world unit at the object's depth
+        const radius = 1.6 * baseScale * unit;
+        const left = copy.right > 0 ? copy.right + GAP : grid.width * 0.55;
+        const cx = Math.min(left + radius, grid.width - radius - 40);
+        x = (cx / grid.width - 0.5) * visW;
+        y = copy.mid > 0 ? (0.5 - copy.mid / grid.height) * visH : 0.05;
+      }
+      group.position.set(x, y + scroll * visH * 0.45, 0);
       group.scale.setScalar(baseScale * scale * (1 - scroll * 0.25));
       group.rotation.set(rot.x + tilt.x, rot.y + tilt.y, scroll * 0.8);
 
