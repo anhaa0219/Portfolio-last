@@ -7,7 +7,7 @@ import { CountUp, Scramble, useInView } from "../motion";
 
 // The last year on GitHub, told as it scrolls in: the labels decode, the
 // figures count up, the calendar inks in as a diagonal wave from the oldest
-// week to today, and a light sweeps across it.
+// week to today, and then stays still.
 
 const EN_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -118,7 +118,6 @@ export function ContributionGraph({ data, profile, lang }: { data: Contributions
                     ) : null,
                   ),
                 )}
-                <span className="gh-sweep" aria-hidden />
               </div>
             </div>
           </div>

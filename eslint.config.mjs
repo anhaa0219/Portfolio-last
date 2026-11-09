@@ -12,8 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Vendored from the stageshow skill (React 18 code, opted out of the
-    // React Compiler with "use no memo"); update it by re-copying, not by hand
+    // Vendored copy of the stageshow kit (React 18 code, opted out of the
+    // React Compiler with "use no memo"); the skill itself is no longer installed
     "src/stageshow/kit/**",
   ]),
 ]);
